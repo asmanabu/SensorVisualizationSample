@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Sensor Data Visualization</title>
+    
+    <script type="text/javascript" src="//www.google.com/jsapi"></script>
+    
+    <script type="text/javascript">
+      var wsUrl = '<Your WebSocket URL>';
+      
+      var socket;
+      var temperatureData, humidityData;
+      var temperatureOptions, humidityOptions;
+      var temperatureChart, humidityChart;
+      
+      // Google Gauge
+      google.load("visualization", "1", {packages:["gauge"]});
+      google.setOnLoadCallback(drawChart);
+      function drawChart() {
+        // Data for temperature chart
+        temperatureData = google.visualization.arrayToDataTable([
+          ['Label', 'Value'],
+          ['Temperature', 0],
+          ['Object Temperature', 0]
+        ]);
+        
+        // Data for humidity chart
+        humidityData = google.visualization.arrayToDataTable([
+          ['Label', 'Value'],
+          ['Humidity', 0]
+        ]);
+        
+        // Option for temperature chart
+        // If you want to set other options, please refer to https://developers.google.com/chart/interactive/docs/gallery/gauge
+        temperatureOptions = {
+          width: 400, height: 120,
+          min: 0, max: 60,
+          redFrom: 50, redTo: 60,
+          yellowFrom:40, yellowTo: 50,
+          minorTicks: 5
+        };
+        
+        // Option for humidity chart
+        humidityOptions = {
+          width: 400, height: 120,
+          min: 0, max: 100,
+          redFrom: 90, redTo: 100,
+          yellowFrom:75, yellowTo: 90,
+          minorTicks: 5
+        };
+        
+        temperatureChart = new google.visualization.Gauge(document.getElementById('temperatureChart'));
+        humidityChart = new google.visualization.Gauge(document.getElementById('humidityChart'));
+        
+        temperatureChart.draw(temperatureData, temperatureOptions);
+        humidityChart.draw(humidityData, humidityOptions);
+      };
+      
+      function connect() {
+        socket = new WebSocket(wsUrl);
+        socket.onmessage = function(e) {
+          var sensorData = JSON.parse(e.data);
+          
+          // Update temperature data
+          temperatureData.setValue(0, 1, sensorData.temp);
+          temperatureData.setValue(1, 1, sensorData.objectTemp);
+          
+          // Update humidity data
+          humidityData.setValue(0, 1, sensorData.humidity);
+          
+          temperatureChart.draw(temperatureData, temperatureOptions);
+          humidityChart.draw(humidityData, humidityOptions);
+        };
+      };
+      
+      function disconnect() {
+        socket.close();
+      };
+        
+    </script>
+  </head>
+  <body>
+    <h1>Welcome to IoT Foundation Visualization Sample Web</h1>
+    <div>
+      <button onclick="connect()">Connect</button>
+      <button onclick="disconnect()">Disconnect</button>
+    </div>
+    
+    <div>
+      <div id="temperatureChart" style="width: 400px; height: 120px;"></div>
+      <div id="humidityChart" style="width: 400px; height: 120px;"></div>
+    </div>
+  </body>
+</html>

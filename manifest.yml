@@ -1,0 +1,9 @@
+applications:
+- disk_quota: 1024M
+  name: <Yout Application Name>
+  host: <Your Host Name>
+  domain: mybluemix.net
+  path: ./public
+  instances: 1
+  memory: 64M
+  buildpack: https://github.com/cloudfoundry-incubator/staticfile-buildpack
