@@ -1,7 +1,7 @@
 applications:
 - disk_quota: 1024M
-  name: <Yout Application Name>
-  host: <Your Host Name>
+  name: Sensor Data Visualization Sample
+  host: <change to your hostname>
   domain: mybluemix.net
   path: ./public
   instances: 1
